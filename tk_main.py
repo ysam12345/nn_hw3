@@ -1,14 +1,8 @@
-
-#!/usr/bin/env python
 #coding:utf-8
 import numpy as np
 from tkinter import *
 import tkinter as tk
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 from tkinter.filedialog import askopenfilename
-import pandas as pd
 from hopfield import HOP
 
 
@@ -18,6 +12,8 @@ class Application(tk.Frame):
         self.training_data_num = 0
         self.testing_data_num = 0
         self.classify_data_index = 0
+        self.input_x = 0
+        self.input_y = 0
         self.training_data = []
         self.testing_data = []
         self.testing_result = []
@@ -100,21 +96,28 @@ class Application(tk.Frame):
 
     def load_training_data(self):
         try:
+            self.training_data = []
             filename = askopenfilename()
             self.training_data_file_path_label["text"] = filename
+            if (filename.split('/')[len(filename.split('/'))-1].split("_")[0]) == "Basic":
+                self.input_x = 9
+                self.input_y = 13
+            elif (filename.split('/')[len(filename.split('/'))-1].split("_")[0]) == "Bonus":
+                self.input_x = 10
+                self.input_y = 11
             f = open(filename, "r")
             line_num = 0
             for line in f:
                 line_num += 1
             f = open(filename, "r") 
             print(line_num)
-            self.training_data_num = int((line_num + 1) / 13)
+            self.training_data_num = int((line_num + 1) / self.input_y)
             print(self.training_data_num)
             for i in range(self.training_data_num):
                 a = []
-                for j in range(13):
+                for j in range(self.input_y):
                     line = f.readline()
-                    if j == 12:
+                    if j == self.input_y - 1 :
                         break
                     for c in line:
                         if c == '\n':
@@ -135,22 +138,29 @@ class Application(tk.Frame):
             self.training_data_file_path_label["text"] = ""
 
     def load_testing_data(self):
+        self.testing_data = []
         try:
             filename = askopenfilename()
             self.testing_data_file_path_label["text"] = filename
+            if (filename.split('/')[len(filename.split('/'))-1].split("_")[0]) == "Basic":
+                self.input_x = 9
+                self.input_y = 13
+            elif (filename.split('/')[len(filename.split('/'))-1].split("_")[0]) == "Bonus":
+                self.input_x = 10
+                self.input_y = 11
             f = open(filename, "r")
             line_num = 0
             for line in f:
                 line_num += 1
             f = open(filename, "r") 
             print(line_num)
-            self.testing_data_num = int((line_num + 1) / 13)
+            self.testing_data_num = int((line_num + 1) / self.input_y)
             print(self.testing_data_num)
             for i in range(self.testing_data_num):
                 a = []
-                for j in range(13):
+                for j in range(self.input_y):
                     line = f.readline()
-                    if j == 12:
+                    if j == self.input_y - 1:
                         break
                     for c in line:
                         if c == '\n':
@@ -174,11 +184,11 @@ class Application(tk.Frame):
         s = ''
         for c in a:
             if c == 0 or c == 0.:
-                c = ' '
+                c = '　'
             elif c == 1 or c == 1.:
-                c = '1'
+                c = '１'
             s += c
-            if(len(s) == 9):
+            if(len(s) == self.input_x):
                 print(s)
                 s = ''
 
@@ -187,11 +197,11 @@ class Application(tk.Frame):
         s = ''
         for c in a:
             if c == 0 or c == 0.:
-                c = '0'
+                c = '　'
             elif c == 1 or c == 1.:
-                c = '1'
+                c = '１'
             s += c
-            if(len(s) == 9):
+            if(len(s) == self.input_x):
                 ss += s
                 ss += '\n'
                 s = ''
@@ -202,7 +212,7 @@ class Application(tk.Frame):
             print("未選取檔案")
             tk.messagebox.showinfo("Error","未選取資料集")
             return
-        hop = HOP(9 * 12)
+        hop = HOP(self.input_x * (self.input_y-1))
         hop.hopTrain(self.training_data)
         for data in self.testing_data:
             print("Origin:")
